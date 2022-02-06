@@ -27,7 +27,32 @@ module.exports = {
                 res.status(403).json({ message: 'Invalid email' });
             }
         } catch (error) {
-            console.log(error);
+            next(error);
+        }
+    },
+    signup: async(req, res, next) => {
+        try {
+            const { name, email, password, confirmPassword } = req.body;
+
+            if (password !== confirmPassword) {
+                res.status(403).json({ message: "Password and Confirm Password don\'t match"})
+            }
+
+            const checkEmail = await User.findOne({ where: { email: email } });
+            if (checkEmail) {
+                return res.status(403).json({ message: "Email registered"})
+            }
+
+            const user = await User.create({ name, email, password: bcrypt.hashSync(password, 10), role: "admin" });
+
+            delete user.dataValues.password;
+
+            res.status(201).json({ 
+                message: "Success Signup",
+                data: user,
+            })
+            
+        } catch (error) {
             next(error);
         }
     },
