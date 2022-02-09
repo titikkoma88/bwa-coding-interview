@@ -106,7 +106,7 @@ module.exports = {
                 user: user,
             });
 
-            res.status(201).json({
+            res.status(200).json({
                 message: 'Success update books',
                 data: books,
             });
@@ -114,4 +114,23 @@ module.exports = {
             next(error)
         }
     },
+
+    deleteBooks: async (req, res, next) => {
+        try {
+            const books = await Book.findOne({ where: { id: req.params.id } });
+
+            if(!books) {
+                return res.status(404).json({ message: 'id book not found'});
+            }
+
+            books.destroy();
+
+            res.status(200).json({
+                message: 'Success delete books',
+                data: books,
+            });
+        } catch (error) {
+            next(error)
+        }
+    }
 };
